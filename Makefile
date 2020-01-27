@@ -11,14 +11,21 @@ LIBRARIES	:=
 
 ifeq ($(OS),Windows_NT)
 EXECUTABLE	:= main.exe
+EXECUTABLE_TRACE	:= generateTrace.exe
 else
 EXECUTABLE	:= main
+EXECUTABLE_TRACE	:= generateTrace
 endif
 
 all: $(BIN)/$(EXECUTABLE)
 
 clean:
 	$(RM) $(BIN)/$(EXECUTABLE)
+	$(RM) $(BIN)/$(EXECUTABLE_TRACE)
+
+tracegen:
+	$(CC) $(C_FLAGS) -I$(INCLUDE) -L$(LIB) $(SRC)/$(EXECUTABLE_TRACE).cpp -o $(BIN)/$(EXECUTABLE_TRACE)
+	./$(BIN)/$(EXECUTABLE_TRACE)
 
 run: all
 	./$(BIN)/$(EXECUTABLE)
