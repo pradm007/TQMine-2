@@ -5,9 +5,19 @@
  * @modify date 2020-01-26 12:35:52
  */
 
-#include "../lib/commonHeader.h"
+#include "../include/commonHeader.h"
+
+string pattern;
+int alphabetLength = 0;
 
 int main(int argc, char *argv[]) {
-	cout << "Hello Easy C++ project!" << endl;
+	cout << "Enter Regex pattern : ";
+	cin >> pattern;
+
+	cout << "Enter event length (max 26) : ";
+	cin >> alphabetLength;
+
+	alphabetLength = maxOf(alphabetLength, 26);
+
 	return 0;
 }
