@@ -6,9 +6,10 @@
  */
 
 #include "../include/commonHeader.h"
+#include "./ragelGenerator.cpp"
 
-string pattern;
-int alphabetLength = 0;
+string pattern = "0M1M2";
+int alphabetLength = 3;
 
 int main(int argc, char *argv[]) {
 	cout << "Enter Regex pattern : ";
@@ -17,7 +18,10 @@ int main(int argc, char *argv[]) {
 	cout << "Enter event length (max 26) : ";
 	cin >> alphabetLength;
 
-	alphabetLength = maxOf(alphabetLength, 26);
+	alphabetLength = minOf(alphabetLength, 26);
+
+	RagelGenerator rg;
+	rg.generateRagelFile(pattern, alphabetLength);
 
 	return 0;
 }

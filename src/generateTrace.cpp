@@ -1,4 +1,5 @@
 #include "../include/commonHeader.h"
+#include "../include/writeToFile.h"
 #include <stdio.h>
 
 const string name = "trace";
@@ -11,30 +12,18 @@ char getRandomCharacter(int maxShift = 1) {
   return (char)(getRandomDigit(maxShift) + 97);
 }
 
-void deleteFile() {
-  if (remove(fileName.c_str()) != 0)
-    perror("Error deleting file");
-  else
-    puts("Old Trace file successfully deleted");
-}
 
 int writeToFile(int alphabetLength = 4, long traceLength = 100) {
 
   string traceString;
-  ofstream myfile;
-
-  deleteFile();
-  myfile.open(fileName);
   for (long i = 0; i < traceLength; i++) {
     traceString +=
         getRandomCharacter(alphabetLength) + to_string(getRandomDigit(100000));
   }
 
   traceString += getRandomCharacter(alphabetLength) + "\n";
-  myfile << traceString;
-  myfile.close();
 
-  return true;
+  return writeToFile(fileName, traceString);
 }
 
 int main() {
