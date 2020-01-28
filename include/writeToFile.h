@@ -13,11 +13,12 @@ class Util {
   }
 
   static int deleteFile(const string fileName) {
+    cout << "Searching for file : " << fileName << endl;
     if (!fexists(fileName.c_str())){
-      puts("No old file found. ");
+      puts("\tNo old file found. ");
       return true;
     } else if (remove(fileName.c_str()) != 0) {
-      perror("Error deleting file");
+      perror("\tError deleting file");
       return false;
     } else {
       puts("Old file successfully deleted");

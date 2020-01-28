@@ -71,7 +71,7 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
     string content = R"(
     #include <bits/stdc++.h>
     using namespace std;
-    #define DEBUG 1
+    #define DEBUG 0
 
 
     const string numberListPattern = "[0-9]+";
@@ -124,7 +124,9 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
 
         const bool is_in = patternMap.find(fullPattern) != patternMap.end();
         if (is_in) {
-            cout << "Found " << fullPattern << endl;
+            if (DEBUG) {
+                cout << "Found " << fullPattern << endl;
+            }
             auto itr = patternMap.find(fullPattern);
             vector<vector<int> >  oldNumberList = itr->second;
             for (int j=0;j<newNumberList.size();j++) {
@@ -132,7 +134,9 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
             }
             patternMap[itr->first] = oldNumberList;
         } else {
-            cout << "Did not find " << fullPattern << " thus inserting new " << endl;
+            if (DEBUG) {
+                cout << "Did not find " << fullPattern << " thus inserting new " << endl;
+            }
             patternMap.emplace(fullPattern, newNumberList);
         }
 
@@ -173,9 +177,9 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
         cs = foo_start;
         totalLength = strlen(p);
         char *eof;
-        printf("Input is %s \n",p);
+        // printf("Input is %s \n",p);
         vector<int> temp_numbersInPattern;
-        printf("cs is %d and foo_start is %d\n", cs, foo_start);
+        // printf("cs is %d and foo_start is %d\n", cs, foo_start);
 
         %%{
             
@@ -191,7 +195,7 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
 
             action A {
                 res++;
-                printf("Match happened.\n");
+                // printf("Match happened.\n");
                 for (int i=0 ;i< temp_numbersInPattern.size(); i++) {
                     if (DEBUG) {
                         cout << temp_numbersInPattern[i] << " ~ ";
