@@ -30,7 +30,9 @@ tracegen:
 	./$(BIN)/$(EXECUTABLE_TRACE) $(COMMAND_TRACEGEN)
 
 main:
-	$(CC) $(C_FLAGS) -I$(INCLUDE) -L$(LIB) $(SRC)/$(EXECUTABLE).cpp -$(SO_FLAG) -o $(BIN)/$(EXECUTABLE) $(LIBRARIES) -$(SO_FLAG)
+	d=$$(date +%s)\
+	; $(CC) $(C_FLAGS) -I$(INCLUDE) -L$(LIB) $(SRC)/$(EXECUTABLE).cpp -$(SO_FLAG) -o $(BIN)/$(EXECUTABLE) $(LIBRARIES) -$(SO_FLAG)	\
+	&& echo "Build took $$(($$(date +%s)-d)) seconds"
 	./$(BIN)/$(EXECUTABLE) $(COMMAND_MAIN)
 
 run: all
