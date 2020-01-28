@@ -6,6 +6,7 @@
 #include <dlfcn.h>
 
 class TracePattern {
+    string shareObject_FileName = "./bin/fsm.so";
 
     public:
     void loadAndTrace();
