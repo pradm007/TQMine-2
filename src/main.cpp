@@ -6,22 +6,16 @@
  */
 
 #include "../include/commonHeader.h"
-#include "../include/ragelGenerator.h"
-
-string pattern = "0M1M2";
-int alphabetLength = 3;
+#include "../include/generateTrace.h"
+#include "../include/minePattern.h"
 
 int main(int argc, char *argv[]) {
-	cout << "Enter Regex pattern : ";
-	cin >> pattern;
 
-	cout << "Enter event length (max 26) : ";
-	cin >> alphabetLength;
+  if (!strcmp("tracegen", argv[argc - 1])) {
+    _main_generateTrace();
+  } else {
+    _main_mineTrace();
+  }
 
-	alphabetLength = minOf(alphabetLength, 26);
-
-	RagelGenerator rg;
-	rg.generateRagelFile(pattern, alphabetLength);
-
-	return 0;
+  return 0;
 }

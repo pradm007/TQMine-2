@@ -9,6 +9,16 @@
         "fstream": "cpp",
         "deque": "cpp",
         "string": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "cctype": "cpp",
+        "cerrno": "cpp",
+        "cfloat": "cpp",
+        "new": "cpp",
+        "memory": "cpp",
+        "locale": "cpp",
+        "limits": "cpp",
+        "iterator": "cpp",
+        "istream": "cpp",
+        "map": "cpp"
     }
 }

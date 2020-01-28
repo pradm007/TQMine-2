@@ -1,3 +1,6 @@
+#ifndef RAGEL_GEN
+#define RAGEL_GEN
+
 #include "../include/commonHeader.h"
 #include "../include/writeToFile.h"
 #include <boost/algorithm/string.hpp>
@@ -27,3 +30,4 @@ class RagelGenerator {
     void generateRagelFile(string &dynamicRegexExpression, int alphabetLength = 1);
 
 };
+#endif

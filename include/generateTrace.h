@@ -1,3 +1,6 @@
+#ifndef GEN_TRACE
+#define GEN_TRACE
+
 #include "../include/commonHeader.h"
 #include "../include/writeToFile.h"
 #include <stdio.h>
@@ -15,7 +18,7 @@ char getRandomCharacter(int maxShift = 1) {
 
 int writeToFile(int alphabetLength = 4, long traceLength = 100) {
 
-  string traceString;
+  string traceString = "";
   for (long i = 0; i < traceLength; i++) {
     traceString +=
         getRandomCharacter(alphabetLength) + to_string(getRandomDigit(100000));
@@ -23,10 +26,10 @@ int writeToFile(int alphabetLength = 4, long traceLength = 100) {
 
   traceString += getRandomCharacter(alphabetLength) + "\n";
 
-  return writeToFile(fileName, traceString);
+  return Util::writeToFileFunc(fileName, traceString);
 }
 
-int main() {
+void _main_generateTrace() {
 
   cout << "Enter the following details to generate synthetic trace" << endl;
 
@@ -43,5 +46,5 @@ int main() {
   } else {
     cout << "Something went wrong" << endl;
   }
-  return 0;
 }
+#endif

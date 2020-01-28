@@ -2,7 +2,7 @@
 #include "../include/ragelGenerator.h"
 #define LOCAL_DEBUG 0
 
-void RagelGenerator::prepareAlphabetArr(int alphabetLength = 1) {
+void RagelGenerator::prepareAlphabetArr(int alphabetLength) {
     alphabetArr.clear();
     alphabetVisitied.clear();
     overallPattern.clear();
@@ -51,7 +51,7 @@ void RagelGenerator::generateExpression(string &dynamicRegexExpression, int curr
  * @param dynamicRegexExpression Either in format 0.M.1 or 0.N.1
  * @param alphabetLength Number of event
  */
-string RagelGenerator::getRagelExpression(string &dynamicRegexExpression, int alphabetLength = 1) {
+string RagelGenerator::getRagelExpression(string &dynamicRegexExpression, int alphabetLength) {
 
     prepareAlphabetArr(alphabetLength);
     string prefix = "";
@@ -264,7 +264,7 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
     return content;
 }
 
-void RagelGenerator::generateRagelFile(string &dynamicRegexExpression, int alphabetLength = 1) {
+void RagelGenerator::generateRagelFile(string &dynamicRegexExpression, int alphabetLength) {
 
     if (LOCAL_DEBUG) {
     prepareAlphabetArr(alphabetLength);
@@ -277,7 +277,7 @@ void RagelGenerator::generateRagelFile(string &dynamicRegexExpression, int alpha
     string fullRagelExpression = getRagelExpression(dynamicRegexExpression, alphabetLength);
     string ragelContent = getFullRagelContent(fullRagelExpression);
 
-    if (writeToFile(fileName, ragelContent) != 0) {
+    if (Util::writeToFileFunc(fileName, ragelContent) != 0) {
     cout << "Ragel FSM file generated successfully" << endl;
     } else {
     cout << "Something went wrong" << endl;
