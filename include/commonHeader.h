@@ -1,5 +1,5 @@
-#ifdef COMMON_HEADER
-#define COMMON_HEADER
+// #ifdef COMMON_HEADER
+// #define COMMON_HEADER
 
 #include <bits/stdc++.h>
 #include <fstream>
@@ -10,5 +10,5 @@
 typedef long long unsigned lln;
 typedef long double lld;
 
-#endif
+// #endif
 using namespace std;

@@ -6,7 +6,7 @@
  */
 
 #include "../include/commonHeader.h"
-#include "./ragelGenerator.cpp"
+#include "../include/ragelGenerator.h"
 
 string pattern = "0M1M2";
 int alphabetLength = 3;
