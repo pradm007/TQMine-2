@@ -8,6 +8,7 @@
         "vector": "cpp",
         "fstream": "cpp",
         "deque": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "iostream": "cpp"
     }
 }
