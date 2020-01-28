@@ -64,7 +64,7 @@ string RagelGenerator::getRagelExpression(string &dynamicRegexExpression, int al
     int j=0;
     generateExpression(dynamicRegexExpression, 0, 0, alphabetLength, prefix);
 
-    return "((" + overallPattern + ")+) $to(CHUNK) %to(A) $lerr(E)";
+    return "((" + overallPattern + ")+) $to(CHUNK) %to(A) $lerr(E);";
 }
 
 string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
@@ -159,6 +159,8 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
         }
     }
 
+
+    extern "C" {void mine_pattern(char *p);}
     void mine_pattern(char *p) {
         int cs, res = 0;
         int totalLength = 0, currentLength = 0;
@@ -244,7 +246,7 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
                 }
             }
         
-            main := )" + overallPattern + R"(
+            main := )" + fullRagelExpression + R"(
 
             write init nocs;
             write exec noend;

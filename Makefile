@@ -9,7 +9,7 @@ SO_FLAG	:= ldl
 COMMAND_TRACEGEN := tracegen
 COMMAND_MAIN := main
 
-LIBRARIES	:= src/ragelGenerator.cpp
+LIBRARIES	:= src/ragelGenerator.cpp src/tracePattern.cpp
 
 ifeq ($(OS),Windows_NT)
 EXECUTABLE	:= main.exe
@@ -30,7 +30,7 @@ tracegen:
 	./$(BIN)/$(EXECUTABLE_TRACE) $(COMMAND_TRACEGEN)
 
 main:
-	$(CC) $(C_FLAGS) -I$(INCLUDE) -L$(LIB) $(SRC)/$(EXECUTABLE).cpp -$(SO_FLAG) -o $(BIN)/$(EXECUTABLE) $(LIBRARIES)
+	$(CC) $(C_FLAGS) -I$(INCLUDE) -L$(LIB) $(SRC)/$(EXECUTABLE).cpp -$(SO_FLAG) -o $(BIN)/$(EXECUTABLE) $(LIBRARIES) -$(SO_FLAG)
 	./$(BIN)/$(EXECUTABLE) $(COMMAND_MAIN)
 
 run: all
