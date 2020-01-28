@@ -4,6 +4,10 @@
         "cstdio": "cpp",
         "forward_list": "cpp",
         "list": "cpp",
-        "functional": "cpp"
+        "functional": "cpp",
+        "vector": "cpp",
+        "fstream": "cpp",
+        "deque": "cpp",
+        "string": "cpp"
     }
 }
