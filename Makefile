@@ -27,6 +27,10 @@ tracegen:
 	$(CC) $(C_FLAGS) -I$(INCLUDE) -L$(LIB) $(SRC)/$(EXECUTABLE_TRACE).cpp -o $(BIN)/$(EXECUTABLE_TRACE)
 	./$(BIN)/$(EXECUTABLE_TRACE)
 
+main:
+	$(CC) $(C_FLAGS) -I$(INCLUDE) -L$(LIB) $(SRC)/$(EXECUTABLE).cpp -$(SO_FLAG) -o $(BIN)/$(EXECUTABLE)
+	./$(BIN)/$(EXECUTABLE)
+
 run: all
 	./$(BIN)/$(EXECUTABLE)
 
