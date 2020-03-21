@@ -8,8 +8,8 @@ void RagelGenerator::prepareAlphabetArr(int alphabetLength) {
     overallPattern.clear();
 
     for (int i = 0; i < alphabetLength; i++) {
-    alphabetArr.push_back((char)(97 + i));
-    alphabetVisitied.push_back(0);
+        alphabetArr.push_back((char)(97 + i));
+        alphabetVisitied.push_back(0);
     }
 }
 
@@ -54,6 +54,7 @@ void RagelGenerator::generateExpression(string &dynamicRegexExpression, int curr
 string RagelGenerator::getRagelExpression(string &dynamicRegexExpression, int alphabetLength) {
 
     prepareAlphabetArr(alphabetLength);
+    determineQuantPlaceholdersInExpression(dynamicRegexExpression);
     string prefix = "";
 
     // vector<string> dynamicRegexExpressionArr; 
@@ -67,119 +68,295 @@ string RagelGenerator::getRagelExpression(string &dynamicRegexExpression, int al
     return "((" + overallPattern + ")+) $to(CHUNK) %to(A) $lerr(E);";
 }
 
+/**
+ * Function to determine the count of placeholders. This would help in dividing the chunks in proportions
+ * @param dynamicRegexExpression Either in format 0.M.1 or 0.N.1
+**/
+void RagelGenerator::determineQuantPlaceholdersInExpression(string &dynamicRegexExpression) {
+  for (int currentIndex = 0; currentIndex < dynamicRegexExpression.size();
+       currentIndex++) {
+    if (dynamicRegexExpression.at(currentIndex) == NUM_TRACK_SYMBL ||
+        dynamicRegexExpression.at(currentIndex) == NUM_NOT_TRACK_SYMBL) {
+      quantPlaceholderCount++;
+    }
+  }
+
+  if (LOCAL_DEBUG) {
+      cout << "Quant placeholders found to be " << quantPlaceholderCount << endl;
+  }
+}
+
 string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
     string content = R"(
     #include <bits/stdc++.h>
+    #include <omp.h>
     using namespace std;
-    #define DEBUG 0
 
+    #ifndef DEBUG
+    #define DEBUG 0
+    #endif
+
+    #ifndef MINIMAL
+    #define MINIMAL 1
+    #endif
+
+    #ifndef FILEINPUT
+    #define FILEINPUT 0
+    #endif
+
+    #ifndef MINIMAL_2
+    #define MINIMAL_2 1
+    #endif
+
+    #ifndef DISPLAY_MAP
+    #define DISPLAY_MAP 0
+    #endif
 
     const string numberListPattern = "[0-9]+";
-    int _tempPatternListIndex = 0;
+    unordered_map<string, vector<vector<string> > > patternMap;
+
+    int g_reserveSize = 1e+7;
+    const int CHUNK_DELIMITER_SIZE = 1e+5;
+    int g_delimiterCount = 0;
+    int g_totalCombination = 4;
+    int THREAD_COUNT = 16;
+    const char delimiter = '|';
+    vector<string> inputStream_per_thread;
+
+
+    void chunkDivider(char *inp);
+    void showChunks();
+    void serialeExecution(char *);
+    void parallelExecution(char *);
+    void chunkDivider(char *, int );
+    void releaseMemory(vector<vector<string> > &);
 
     %% machine foo;
     %% write data;
 
-    string getString(char ch) { 
-        string temp = "";
-        return "" + ch;    
-    } 
-
-    void insertIntoTempPatternList(vector<string>  &tempPatternList, char element, int where) {
-        switch(where) {
-            case 0:
-                if (tempPatternList.empty()) { //completely empty. This happens in the first match
-                    string temp = "";
-                    temp.push_back((char) element);
-                    tempPatternList.push_back(temp);
-                } else {
-                    tempPatternList[where].push_back((char) element);
-                }
-
-            break;
-            case 1:
-                if (tempPatternList.size() == where) { //no new element in the 2nd index
-                    string temp = "";
-                    temp.push_back((char) element);
-                    tempPatternList.push_back(temp);
-                } else {
-                    tempPatternList[where].push_back((char) element);
-                }
-
-            break;
-        };
+    void insertIntoTempPatternList(string  &tempPatternList, char element, int *flipperOnEvent, vector<string> *numberList) {
+        if ((element >= 97 && element <= 122) ) { //its event
+            tempPatternList += element;
+            // tempPatternList.push_back(element);
+            *flipperOnEvent = 1;
+        } else { //its a number
+            if ((char) tempPatternList[tempPatternList.size() - 1] != (char) numberListPattern[numberListPattern.size() - 1]) {
+                tempPatternList += numberListPattern;
+                // tempPatternList.push_back(numberListPattern);
+            }
+            if (*flipperOnEvent == 1) {
+                //Add new vector for number tracing
+                numberList->push_back("");
+            }
+            *flipperOnEvent = 0;
+        }
     }
 
-    void insertIntoPatternList(map<string, vector<vector<int> > > &patternMap, vector<string>  &tempPatternList, vector<vector<int> > &numberList) {
-        string fullPattern = "";
+    void insertIntoPatternList(unordered_map<string, vector < vector<string > > > &patternMap, string  &fullPattern, vector<string > *numberList) {
 
-        for (int i=0;i<tempPatternList.size();i++) {
-            fullPattern += tempPatternList[i];
-            if (tempPatternList.size()-1 > i) {
-                fullPattern += numberListPattern;
-            }
-        }
-
-        vector<vector<int> >  newNumberList = numberList;
-
-        const bool is_in = patternMap.find(fullPattern) != patternMap.end();
+        auto itr = patternMap.find(fullPattern);
+        const bool is_in = itr != patternMap.end();
         if (is_in) {
-            if (DEBUG) {
+            if (!MINIMAL) {
                 cout << "Found " << fullPattern << endl;
             }
-            auto itr = patternMap.find(fullPattern);
-            vector<vector<int> >  oldNumberList = itr->second;
-            for (int j=0;j<newNumberList.size();j++) {
-                oldNumberList.push_back(newNumberList[j]);
-            }
-            patternMap[itr->first] = oldNumberList;
+            vector<vector<string > > *oldNumberList = &itr->second;
+            oldNumberList->push_back(*numberList);
         } else {
-            if (DEBUG) {
+            if (!MINIMAL) {
                 cout << "Did not find " << fullPattern << " thus inserting new " << endl;
             }
-            patternMap.emplace(fullPattern, newNumberList);
+            vector<vector<string> > *newNumberList = new vector<vector<string> >;
+
+            // newNumberList->reserve(10000);
+            newNumberList->push_back(*numberList);
+            patternMap.emplace(fullPattern, *newNumberList);
         }
 
     }
 
-    void resetPatternList(vector<string> &tempPatternList) {
-        _tempPatternListIndex = 0;
+    void resetPatternList(string &tempPatternList) {
         tempPatternList.clear();
     }
 
-    void displayPatternList(map<string, vector<vector<int> > > &patternMap) {
+    void displayPatternList_Internal(vector<vector<string> > &numberList) {
+        for (int i =0; i < numberList.size(); i++) {
+                printf("\tList %d : \n\t\t\t", i+1);
+                for (int j=0;j<numberList[i].size(); j++) {
+                    cout << numberList[i][j];
+                }
+                printf("\n");
+            }
+    }
+
+    void displayPatternList(unordered_map<string, vector<vector<string> > > &patternMap) {
         for (auto itr = patternMap.begin(); itr != patternMap.end(); itr++) {
             string pattern = "" + (string) itr->first;
             cout << pattern << " :\n";
-            vector<vector<int> > numberList = itr->second;	
-            for (int i =0; i < numberList.size(); i++) {
+            vector<vector<string> > numberList = itr->second;	
+            /* for (int i =0; i < numberList.size(); i++) {
                 printf("\tList %d : \n\t\t\t", i+1);
                 for (int j=0;j<numberList[i].size(); j++) {
-                    printf("%d ",numberList[i][j]);
+                    cout << numberList[i][j];
                 }
                 printf("\n");
+            } */
+            displayPatternList_Internal(numberList);
+        }
+    }
+
+
+    void mergeList(unordered_map<string, vector<vector<string> > > &patternMapInternal) {
+
+        for (auto itr = patternMapInternal.begin(); itr != patternMapInternal.end(); itr++) {
+            auto itr_global = patternMap.find((string) itr->first);
+            const bool is_in = itr_global != patternMap.end();
+
+            vector<vector<string> > pMapInternalValue = (vector<vector<string> >) itr->second;
+
+            if (is_in) { //Existing pattern
+                vector<vector<string> >  *oldNumberList = &itr_global->second;
+                
+                int oldSize = pMapInternalValue.size();
+
+                for (int i=0; i<pMapInternalValue.size();i++) {
+                    oldNumberList->push_back(pMapInternalValue[i]);
+                }
+
+            } else { //Insert new pattern
+
+                int reserveSize = g_reserveSize > pMapInternalValue.size() ? g_reserveSize : pMapInternalValue.size();
+                vector<vector<string> >  *newNumberList = new vector<vector<string> >;
+                newNumberList->reserve(reserveSize);
+
+                // #pragma omp parallel for
+                for (int i=0; i<pMapInternalValue.size(); i++) {
+                    newNumberList->push_back( pMapInternalValue.at(i) );
+                }
+
+                patternMap.emplace((string) itr->first,  *newNumberList);
             }
 
         }
     }
 
+    void releaseMemory(vector<vector<string> > &outVec) {
+        vector<vector<string> >().swap(outVec);
+    }
 
-    extern "C" {void mine_pattern(char *p);}
+    void chunkDivider_singular(char *inp, int quantPlaceholderCount=1) {
+        int currentIndex = 0, currentThreadIndex = inputStream_per_thread.size() - 1;
+        int currentQuantCount = 0;
+        int isNumber = 0;
+
+        while (inp[currentIndex] != '\0') {
+            if (inp[currentIndex] >= 48 && inp[currentIndex] <= 57) { //is a number
+                if (isNumber == 0) { //Count quant only once for 
+                    currentQuantCount++;
+                }
+
+                isNumber = 1;
+                inputStream_per_thread[currentThreadIndex] += inp[currentIndex];
+            } else { //is event
+                if (isNumber == 1) { // need to start feed to different thread chunk
+                    inputStream_per_thread[currentThreadIndex] += inp[currentIndex];
+
+                    //when to apply delimited
+                    if (currentQuantCount == quantPlaceholderCount) {
+                        inputStream_per_thread[currentThreadIndex] += delimiter;
+                        g_delimiterCount++;
+
+                        if (g_delimiterCount == CHUNK_DELIMITER_SIZE) { // start division for next chunk
+                            currentThreadIndex = currentThreadIndex + 1;
+                            g_delimiterCount = 0;
+                            if (inp[currentIndex+1] != '\0') {
+                                inputStream_per_thread.push_back("");
+                            }
+                        }
+
+                        inputStream_per_thread[currentThreadIndex] += inp[currentIndex];
+
+                        currentQuantCount = 0;
+                    }
+
+                } else {
+                    inputStream_per_thread[currentThreadIndex] += inp[currentIndex];
+                }
+                isNumber = 0;
+            }
+            currentIndex++;
+        }
+
+        //Chop off the excess... iterate from the back
+        int last = inputStream_per_thread[currentThreadIndex].size() - 1;
+        while ((char)inputStream_per_thread[currentThreadIndex][last] != delimiter) {
+            last--;
+        }
+        inputStream_per_thread[currentThreadIndex] = inputStream_per_thread[currentThreadIndex].substr(0, last+1);
+    }
+
+    void chunkDivider(char *inp, int quantPlaceholderCount) {
+
+        inputStream_per_thread.push_back("");
+
+        for (int i=0;i<quantPlaceholderCount;i++) {
+            //Identify starting marker
+            char *startingMarker = inp;
+            int currentEventCount = 0, isEvent = 0;
+            int currentIndex = 0;
+
+            while(startingMarker[currentIndex] != '\0') {
+                if (startingMarker[currentIndex] >= 48 && startingMarker[currentIndex] <= 57) { //is a number
+                    if (isEvent == 1) {
+                        isEvent = 0;
+                    }
+                } else {
+                    if (isEvent == 0) {
+                        isEvent = 1;
+                        currentEventCount++;
+                    }
+                }
+
+                if (currentEventCount == (i+1) ) {
+                    break;//Use the current marker 
+                }
+
+                currentIndex++;
+            }
+
+            chunkDivider_singular(&startingMarker[currentIndex], quantPlaceholderCount);
+        }
+    }
+
+
+    void showChunks() {
+        for (int i=0;i<inputStream_per_thread.size();i++) {
+            cout << "Chunk " << (i+1) << " ~~~ " << inputStream_per_thread[i] <<endl;
+        }
+    }
+
     void mine_pattern(char *p) {
         int cs, res = 0;
         int totalLength = 0, currentLength = 0;
-        vector<int> numbersInPattern;
-        vector<vector<int> > numberList;	
-        vector<string> tempPatternList;
+        string numbersInPattern;
+        vector<string > *numberList = new vector<string>;	
+        string tempPatternList;
+        tempPatternList.reserve(5);
 
-        map<string, vector<vector<int> > > patternMap;
+        int flipperOnEvent = 1; // flips to 0 in case of number
+
+        unordered_map<string, vector<vector<string> > > patternMapInternal;
 
         cs = foo_start;
         totalLength = strlen(p);
         char *eof;
-        // printf("Input is %s \n",p);
-        vector<int> temp_numbersInPattern;
-        // printf("cs is %d and foo_start is %d\n", cs, foo_start);
+        if (!MINIMAL) {
+            printf("Input is %s \n",p);
+        }
+
+        if (!MINIMAL) {
+            printf("cs is %d and foo_start is %d\n", cs, foo_start);
+        }
 
         %%{
             
@@ -187,44 +364,44 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
                 if (DEBUG) {
                     cout << "Element -> " << (char) fc << endl;
                 }
+                if (!MINIMAL) {
+                    cout << "Chunk called " << endl;
+                }
                 currentLength++;
-                if (fc >= 97 && fc <= 122) {
-                    insertIntoTempPatternList(tempPatternList, (char) fc, _tempPatternListIndex);
+                if ((fc >= 97 && fc <= 122) || (fc >= 48 && fc <= 57)) {
+                    insertIntoTempPatternList(tempPatternList, (char) fc, &flipperOnEvent, numberList);
                 }
             }
 
             action A {
                 res++;
-                // printf("Match happened.\n");
-                for (int i=0 ;i< temp_numbersInPattern.size(); i++) {
-                    if (DEBUG) {
-                        cout << temp_numbersInPattern[i] << " ~ ";
-                    }
-                    numbersInPattern.push_back(temp_numbersInPattern[i]);
+                if (!MINIMAL) {
+                    printf("Match happened.\n");
                 }
-                if (DEBUG) {
-                    printf("\n");
-                }
-                numberList.push_back(numbersInPattern);
-                insertIntoPatternList(patternMap, tempPatternList, numberList);
+
+                insertIntoPatternList(patternMapInternal, tempPatternList, numberList);
+
                 resetPatternList(tempPatternList);
-                numberList.clear();
-                numbersInPattern.clear();
-                temp_numbersInPattern.clear();
+
+                numberList = new vector<string>;
 
                 cs = foo_start;
                 p--;
             }
             action NUM {
                 if (fc >= 48 && fc <= 57) {
-                    // printf("	Num =%c \n",fc);
-                    temp_numbersInPattern.push_back( (char) (fc-48));
-                    _tempPatternListIndex = 1;
+                    if (flipperOnEvent == 1) { //Flipper added just to be safe
+                        //Add new vector for number tracing
+                        numberList->push_back(" ");
+                        flipperOnEvent = 0;
+                    }
+
+                    numberList->at(numberList->size() - 1) = numberList->at(numberList->size() - 1) + (char) fc;
                 }
             }
             action NUM_NOTRACK {
                 if (fc >= 48 && fc <= 57) {
-                    // printf(\"Skipping Num =%c \n",fc);
+                    // printf("Skipping Num =%c \n",fc);
                 }
             }
             action E {
@@ -237,8 +414,7 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
                     printf("cs is %d and foo_start is %d\n", cs, foo_start);
                 }
 
-                numberList.clear();
-                temp_numbersInPattern.clear();
+                numberList = new vector<string>;
                 resetPatternList(tempPatternList);
 
                 if (currentLength >= totalLength) {
@@ -250,21 +426,85 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
                 }
             }
         
+
             main := )" + fullRagelExpression + R"(
 
             write init nocs;
             write exec noend;
         }%%
 
-        cout << "Finished processing \n\n";
+        if (!MINIMAL_2)	{
+            cout << "Finished processing \n\n";
+        }
         
-
-
-        printf("Pattern matched %d times\n", res);
         if (DEBUG) {
+            cout << "Displaying internal pattern map per thread" << endl;
+            // #pragma omp critical
+            displayPatternList(patternMapInternal);
+        }
+
+        if (!MINIMAL_2) {
+            printf("For Thread %d \t", omp_get_thread_num());
+            printf("Pattern matched %d times\n", res);
+        }
+
+        #pragma omp critical
+        {
+            if (DEBUG) {
+                cout << "Merging internal and external list" << endl;
+            }
+            mergeList(patternMapInternal);
+            if (DEBUG) {
+                cout << "Merge finished for Thread " << omp_get_thread_num() << endl;
+            }
+        }
+
+    }
+
+    /**
+     * Function for parallel Execution
+     **/
+    extern "C" {void mine_pattern_parallelExecution(char *inp);}
+    void mine_pattern_parallelExecution(char *inp) {
+        
+        double t;
+
+        if (DEBUG) {
+            cout << "Initiating chunk division" << endl;
+        }
+        t = omp_get_wtime();
+        chunkDivider(inp, )" + to_string(quantPlaceholderCount) + R"();
+        if (DEBUG) {
+            printf("Finished chunk division in %.6f ms. \n", (1000 * (omp_get_wtime() - t)));
+        }
+
+        t = omp_get_wtime();
+        if (DEBUG) {
+            showChunks();
+        }
+
+        #pragma omp parallel for num_threads(THREAD_COUNT) shared(patternMap, inputStream_per_thread) firstprivate(numberListPattern, g_reserveSize, g_totalCombination)
+        for (int i=0;i<inputStream_per_thread.size();i++) {
+
+            string chunkForThread = inputStream_per_thread[i];
+            char *inpPerThChar = (char *) malloc(sizeof(char)*(chunkForThread.size() + 1)); 
+            strcpy(inpPerThChar, chunkForThread.c_str());
+            mine_pattern(inpPerThChar);
+            free(inpPerThChar);
+            chunkForThread.clear();
+            chunkForThread.shrink_to_fit();
+        }
+
+        if (DISPLAY_MAP) {
+            cout << "Size of pattern Map " << patternMap.size() << endl;
             displayPatternList(patternMap);
         }
+
+        /* calculate and print processing time*/
+        t = 1000 * (omp_get_wtime() - t);
+        printf("Finished in %.6f ms using %d threads. \n", t, THREAD_COUNT);
     }
+
     )";
 
     return content;
@@ -273,11 +513,12 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
 void RagelGenerator::generateRagelFile(string &dynamicRegexExpression, int alphabetLength) {
 
     if (LOCAL_DEBUG) {
-    prepareAlphabetArr(alphabetLength);
-    string prefix = "";
-    generateExpression(dynamicRegexExpression, 0, 0, alphabetLength, prefix);
-    cout << "overallPattern : " << overallPattern << endl;
-    return;
+        prepareAlphabetArr(alphabetLength);
+        string prefix = "";
+        determineQuantPlaceholdersInExpression(dynamicRegexExpression);
+        generateExpression(dynamicRegexExpression, 0, 0, alphabetLength, prefix);
+        cout << "overallPattern : " << overallPattern << endl;
+        return;
     }
     
     string fullRagelExpression = getRagelExpression(dynamicRegexExpression, alphabetLength);

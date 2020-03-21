@@ -20,6 +20,7 @@ class RagelGenerator {
 
     string overallPattern = "";
 
+    int quantPlaceholderCount = 0;
     vector<char> alphabetArr;
     vector<int> alphabetVisitied;
 
@@ -28,6 +29,6 @@ class RagelGenerator {
     string getRagelExpression(string &dynamicRegexExpression, int alphabetLength = 1);
     string getFullRagelContent(string &fullRagelExpression);
     void generateRagelFile(string &dynamicRegexExpression, int alphabetLength = 1);
-
+    void determineQuantPlaceholdersInExpression(string &dynamicRegexExpression);
 };
 #endif

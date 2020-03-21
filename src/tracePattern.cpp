@@ -25,7 +25,7 @@ void TracePattern::loadAndTrace() {
   if (input != NULL && !string(input).empty()) {
     clock_t start = clock();
     void (*f)(char *);
-    f = (void (*)(char *))dlsym(lib, "mine_pattern");
+    f = (void (*)(char *))dlsym(lib, "mine_pattern_parallelExecution");
     if (f) {
       printf("Dynamic Linker loaded successfully\n");
       f(input);

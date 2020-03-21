@@ -26,7 +26,7 @@ void _main_mineTrace() {
 
     // Compile ragel file
     if (Util::fexists("./bin/fsm.rl")) {
-        system("ragel -C ./bin/fsm.rl -o ./bin/fsm.cpp && g++ -std=c++11 -fpic -w -g -shared "
+        system("ragel -C ./bin/fsm.rl -o ./bin/fsm.cpp && g++ -std=c++11 -fopenmp -fpic -w -g -shared "
                 "-o ./bin/fsm.so -ldl ./bin/fsm.cpp -ldl");
     } else {
         perror("Ragel file not found !!");
