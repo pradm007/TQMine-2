@@ -7,9 +7,56 @@ void RagelGenerator::prepareAlphabetArr(int alphabetLength) {
     alphabetVisitied.clear();
     overallPattern.clear();
 
-    for (int i = 0; i < alphabetLength; i++) {
-        alphabetArr.push_back((char)(97 + i));
-        alphabetVisitied.push_back(0);
+
+    if (alphabetLength < MAX_EVENT_REPRESENTATION) {
+        for (int i = 0; i < alphabetLength; i++) {
+            string repsentationMarker(1,(char)(97 + i));
+            alphabetArr.push_back(repsentationMarker);
+            alphabetVisitied.push_back(0);
+        }
+        eventRepresentationLength = 1;
+    } else {
+        //If alphabet length exceeds alphabetical representation then use numerical suffix as A1,A2,...,B1,B2...
+
+        int bucketSize = alphabetLength/MAX_EVENT_REPRESENTATION;
+        int bucketMoreOver = alphabetLength % MAX_EVENT_REPRESENTATION;
+        int maxBucketSize = bucketSize + (bucketMoreOver > 0 ? 1 : 0);
+
+        eventRepresentationLength = 1 + to_string(maxBucketSize-1).size(); //Minus 1 is because we are starting from 0 index as A0 -> A9 is 10 elements
+        
+        for (int j=0;j<MAX_EVENT_REPRESENTATION;j++) {
+            for (int i = 0; i < bucketSize; i++) {
+                string repsentationMarker(1,(char)(97 + j));
+                repsentationMarker += to_string(i);
+
+                alphabetArr.push_back(repsentationMarker);
+                alphabetVisitied.push_back(0);
+            }
+
+            if (bucketMoreOver > 0) {
+                //Insert the bucketMoreOver once horiztally
+                string repsentationMarker(1,(char)(97 + j));
+                string currentNumber = to_string(bucketSize);
+                string prefixer( (maxBucketSize - 1 - currentNumber.size() ) , '0'); //All of this to just make it uniform as A01, A02...A11...A99
+
+                repsentationMarker += prefixer + currentNumber;
+
+                alphabetArr.push_back(repsentationMarker);
+                alphabetVisitied.push_back(0);
+                bucketMoreOver--;
+            }
+        }
+    }
+
+    if (LOCAL_DEBUG) {
+        cout << "Events are : ";
+        for (int _i=0; _i < alphabetArr.size(); _i++) {
+            cout << alphabetArr[_i] << " ";
+        }
+        cout << endl;
+
+        cout << "eventRepresentationLength : " << eventRepresentationLength << endl;
+
     }
 }
 
@@ -33,11 +80,19 @@ void RagelGenerator::generateExpression(string &dynamicRegexExpression, int curr
             if (alphabetVisitied[index] == 0) {
                 alphabetVisitied[index] = 1;
                 prefix.push_back((char) 39);
-                prefix.push_back((char)alphabetArr[index]);
+                {   //Insert each character into the prefix
+                    for(int _j=0; _j < alphabetArr[index].size(); _j++) {
+                        prefix.push_back(alphabetArr[index].at(_j));
+                    }
+                }
                 prefix.push_back((char) 39);
                 generateExpression(dynamicRegexExpression, currentIndex+1, alphabetIndex, alphabetLength, prefix);
                 prefix.pop_back();
-                prefix.pop_back();
+                {   //Pop the same mount of character out
+                    for(int _j=0; _j < alphabetArr[index].size(); _j++) {
+                        prefix.pop_back();
+                    }
+                }
                 prefix.pop_back();
                 alphabetVisitied[index] = 0;
             }
@@ -109,7 +164,7 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
     #endif
 
     #ifndef DISPLAY_MAP
-    #define DISPLAY_MAP 0
+    #define DISPLAY_MAP 1
     #endif
 
     const string numberListPattern = "[0-9]+";
@@ -122,6 +177,7 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
     int THREAD_COUNT = 16;
     const char delimiter = '|';
     vector<string> inputStream_per_thread;
+    int eventRepresentationLength = )" + to_string(eventRepresentationLength) + R"(;
 
 
     void chunkDivider(char *inp);
@@ -134,19 +190,21 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
     %% machine foo;
     %% write data;
 
-    void insertIntoTempPatternList(string  &tempPatternList, char element, int *flipperOnEvent, vector<string> *numberList) {
-        if ((element >= 97 && element <= 122) ) { //its event
+    void insertIntoTempPatternList(string  &tempPatternList, char element, int *flipperOnEvent, int *currentEventRepresentationLength, vector<string> *numberList) {
+        if ((element >= 97 && element <= 122) || (element >= 48 && element <= 57 && *currentEventRepresentationLength < eventRepresentationLength)) { //its event or its a number bbut needs to be considered as event
+	
+            if (element >= 97 && element <= 122) { //Set the event length to 1. DO NOT do this before this as it would be only correct to start event length check after matching the first alphabetical event character
+                *currentEventRepresentationLength = 0;
+                numberList->push_back(" "); //Add new vector for number tracing
+            }
+
             tempPatternList += element;
-            // tempPatternList.push_back(element);
             *flipperOnEvent = 1;
+            (*currentEventRepresentationLength)++;
         } else { //its a number
             if ((char) tempPatternList[tempPatternList.size() - 1] != (char) numberListPattern[numberListPattern.size() - 1]) {
                 tempPatternList += numberListPattern;
                 // tempPatternList.push_back(numberListPattern);
-            }
-            if (*flipperOnEvent == 1) {
-                //Add new vector for number tracing
-                numberList->push_back("");
             }
             *flipperOnEvent = 0;
         }
@@ -175,8 +233,9 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
 
     }
 
-    void resetPatternList(string &tempPatternList) {
+    void resetPatternList(string &tempPatternList, int* currentEventRepresentationLength) {
         tempPatternList.clear();
+        *currentEventRepresentationLength = 0;
     }
 
     void displayPatternList_Internal(vector<vector<string> > &numberList) {
@@ -247,22 +306,43 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
     void chunkDivider_singular(char *inp, int quantPlaceholderCount=1) {
         int currentIndex = 0, currentThreadIndex = inputStream_per_thread.size() - 1;
         int currentQuantCount = 0;
+        int currentEventRepresentationLength = 0;
         int isNumber = 0;
 
         while (inp[currentIndex] != '\0') {
             if (inp[currentIndex] >= 48 && inp[currentIndex] <= 57) { //is a number
-                if (isNumber == 0) { //Count quant only once for 
+                if (isNumber == 0 && currentEventRepresentationLength < eventRepresentationLength) {
+                    currentEventRepresentationLength++;
+                } else if (isNumber == 0) { //Count quant only once for 
                     currentQuantCount++;
+                    isNumber = 1;
+                    currentEventRepresentationLength = 0;
+                } else {
+                    currentEventRepresentationLength = 0;
                 }
 
-                isNumber = 1;
                 inputStream_per_thread[currentThreadIndex] += inp[currentIndex];
             } else { //is event
+                currentEventRepresentationLength++;
+
                 if (isNumber == 1) { // need to start feed to different thread chunk
                     inputStream_per_thread[currentThreadIndex] += inp[currentIndex];
 
+
                     //when to apply delimited
                     if (currentQuantCount == quantPlaceholderCount) {
+                        if (currentEventRepresentationLength < eventRepresentationLength) {
+                            //Go till the end of the event representation, then do a break.
+                            int innerCurrentIndex = currentIndex + 1;
+
+                            while(inp[innerCurrentIndex] != '\0' && currentEventRepresentationLength < eventRepresentationLength) {
+                                inputStream_per_thread[currentThreadIndex] += inp[innerCurrentIndex];
+                                currentEventRepresentationLength++;
+                                innerCurrentIndex++;
+                            }
+                            currentEventRepresentationLength= 0;//reset to zero for a new beginning
+                        }
+
                         inputStream_per_thread[currentThreadIndex] += delimiter;
                         g_delimiterCount++;
 
@@ -275,6 +355,7 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
                         }
 
                         inputStream_per_thread[currentThreadIndex] += inp[currentIndex];
+                        currentEventRepresentationLength++;//increment again for new count after the delimiter
 
                         currentQuantCount = 0;
                     }
@@ -285,6 +366,7 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
                 isNumber = 0;
             }
             currentIndex++;
+
         }
 
         //Chop off the excess... iterate from the back
@@ -343,6 +425,7 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
         string tempPatternList;
         tempPatternList.reserve(5);
 
+        int currentEventRepresentationLength = 0;
         int flipperOnEvent = 1; // flips to 0 in case of number
 
         unordered_map<string, vector<vector<string> > > patternMapInternal;
@@ -369,7 +452,7 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
                 }
                 currentLength++;
                 if ((fc >= 97 && fc <= 122) || (fc >= 48 && fc <= 57)) {
-                    insertIntoTempPatternList(tempPatternList, (char) fc, &flipperOnEvent, numberList);
+                    insertIntoTempPatternList(tempPatternList, (char) fc, &flipperOnEvent, &currentEventRepresentationLength, numberList);
                 }
             }
 
@@ -381,7 +464,7 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
 
                 insertIntoPatternList(patternMapInternal, tempPatternList, numberList);
 
-                resetPatternList(tempPatternList);
+                resetPatternList(tempPatternList, &currentEventRepresentationLength);
 
                 numberList = new vector<string>;
 
@@ -390,10 +473,8 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
             }
             action NUM {
                 if (fc >= 48 && fc <= 57) {
-                    if (flipperOnEvent == 1) { //Flipper added just to be safe
-                        //Add new vector for number tracing
+                    if (numberList->empty()) {
                         numberList->push_back(" ");
-                        flipperOnEvent = 0;
                     }
 
                     numberList->at(numberList->size() - 1) = numberList->at(numberList->size() - 1) + (char) fc;
@@ -415,7 +496,7 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
                 }
 
                 numberList = new vector<string>;
-                resetPatternList(tempPatternList);
+                resetPatternList(tempPatternList, &currentEventRepresentationLength);
 
                 if (currentLength >= totalLength) {
                     // Force break... very bad practice
@@ -473,7 +554,7 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
             cout << "Initiating chunk division" << endl;
         }
         t = omp_get_wtime();
-        chunkDivider(inp, )" + to_string(quantPlaceholderCount) + R"();
+        chunkDivider(inp, )" + to_string(quantPlaceholderCount)+ R"();
         if (DEBUG) {
             printf("Finished chunk division in %.6f ms. \n", (1000 * (omp_get_wtime() - t)));
         }

@@ -13,6 +13,7 @@ class RagelGenerator {
     const char NUM_NOT_TRACK_SYMBL = 'N';
     const string NUM_TRACK_RAGEL_ACK = "NUM";
     const string NUM_NOT_TRACK_RAGEL_ACK = "NUM_NOTRACK";
+    const int MAX_EVENT_REPRESENTATION = 26; //Denotes 26 letters in english alphabet
 
 
     const string name = "fsm";
@@ -21,7 +22,8 @@ class RagelGenerator {
     string overallPattern = "";
 
     int quantPlaceholderCount = 0;
-    vector<char> alphabetArr;
+    int eventRepresentationLength = 0;
+    vector<string> alphabetArr;
     vector<int> alphabetVisitied;
 
     void prepareAlphabetArr(int alphabetLength = 1);

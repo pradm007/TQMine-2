@@ -18,8 +18,6 @@ void _main_mineTrace() {
     cout << "Enter event length (max 26) : ";
     cin >> alphabetLength;
 
-    alphabetLength = minOf(alphabetLength, 26);
-
     // Generate ragel file
     RagelGenerator rg;
     rg.generateRagelFile(pattern, alphabetLength);
@@ -33,7 +31,7 @@ void _main_mineTrace() {
         return;
     }
 
-    // Perform mining
+    // // Perform mining
     TracePattern tp;
     tp.loadAndTrace();
 }
