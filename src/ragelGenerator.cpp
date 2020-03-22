@@ -164,7 +164,7 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
     #endif
 
     #ifndef DISPLAY_MAP
-    #define DISPLAY_MAP 1
+    #define DISPLAY_MAP 0
     #endif
 
     const string numberListPattern = "[0-9]+";
@@ -601,6 +601,8 @@ void RagelGenerator::generateRagelFile(string &dynamicRegexExpression, int alpha
         cout << "overallPattern : " << overallPattern << endl;
         return;
     }
+
+    double t = omp_get_wtime();
     
     string fullRagelExpression = getRagelExpression(dynamicRegexExpression, alphabetLength);
     string ragelContent = getFullRagelContent(fullRagelExpression);
@@ -610,4 +612,6 @@ void RagelGenerator::generateRagelFile(string &dynamicRegexExpression, int alpha
     } else {
     cout << "Something went wrong" << endl;
     }
+
+    printf("[Elapsed time:  %.6f ms]\n", (1000 * (omp_get_wtime() - t)));
 }
