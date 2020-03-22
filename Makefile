@@ -1,5 +1,5 @@
 CC		:= g++
-C_FLAGS := -std=c++17 -w -g -fopenmp
+C_FLAGS := -std=c++17 -w -g -fopenmp -Ofast
 
 BIN		:= bin
 SRC		:= src
@@ -26,7 +26,7 @@ clean:
 	$(RM) $(BIN)/$(EXECUTABLE_TRACE)
 
 tracegen:
-	$(CC) $(C_FLAGS) -I$(INCLUDE) -L$(LIB) $(SRC)/$(EXECUTABLE).cpp -o $(BIN)/$(EXECUTABLE_TRACE) $(LIBRARIES)
+	$(CC) $(C_FLAGS) -I$(INCLUDE) -L$(LIB) $(SRC)/$(EXECUTABLE).cpp -o $(BIN)/$(EXECUTABLE_TRACE) $(LIBRARIES) -$(SO_FLAG)
 	./$(BIN)/$(EXECUTABLE_TRACE) $(COMMAND_TRACEGEN)
 
 main:
