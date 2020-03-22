@@ -33,8 +33,8 @@ void TracePattern::loadAndTrace() {
       printf("Dynamic Linker loaded failed\n");
       printf("dlsym for function grab failed: %s\n", dlerror());
     }
-    t = 1000 * (omp_get_wtime() - t);
-	  printf("Trace completed in %.6f ms\n", t);
+    
+	  printf("Trace completed [Elapsed time: %.6f ms]\n", (1000 * (omp_get_wtime() - t)));
   }
 
   dlclose(lib);

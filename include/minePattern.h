@@ -15,7 +15,7 @@ void _main_mineTrace() {
     cout << "Enter Regex pattern : ";
     cin >> pattern;
 
-    cout << "Enter event length (max 26) : ";
+    cout << "Enter event length (recommended max limit 100): ";
     cin >> alphabetLength;
 
     // Generate ragel file
@@ -24,8 +24,12 @@ void _main_mineTrace() {
 
     // Compile ragel file
     if (Util::fexists("./bin/fsm.rl")) {
-        system("ragel -C ./bin/fsm.rl -o ./bin/fsm.cpp && g++ -std=c++11 -fopenmp -fpic -w -g -shared "
+        double t = omp_get_wtime();
+        
+        system("ragel -C -T0 ./bin/fsm.rl -o ./bin/fsm.cpp && g++ -std=c++11 -fopenmp -Ofast -fpic -w -g -shared "
                 "-o ./bin/fsm.so -ldl ./bin/fsm.cpp -ldl");
+
+        printf("State machine created successfully [Elapsed time: %.6f ms]\n", (1000 * (omp_get_wtime() - t)));
     } else {
         perror("Ragel file not found !!");
         return;
