@@ -23,7 +23,7 @@ void TracePattern::loadAndTrace() {
   strcpy(input, inp.c_str());
 
   if (input != NULL && !string(input).empty()) {
-    clock_t start = clock();
+    double t = omp_get_wtime();
     void (*f)(char *);
     f = (void (*)(char *))dlsym(lib, "mine_pattern_parallelExecution");
     if (f) {
@@ -33,9 +33,8 @@ void TracePattern::loadAndTrace() {
       printf("Dynamic Linker loaded failed\n");
       printf("dlsym for function grab failed: %s\n", dlerror());
     }
-    clock_t end = clock();
-    clock_t tot_Time = end - start;
-    printf("Trace completed in %lf sec\n", ((float)tot_Time) / CLOCKS_PER_SEC);
+    t = 1000 * (omp_get_wtime() - t);
+	  printf("Trace completed in %.6f ms\n", t);
   }
 
   dlclose(lib);

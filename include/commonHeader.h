@@ -3,6 +3,7 @@
 
 #include <bits/stdc++.h>
 #include <fstream>
+#include <omp.h>
 
 #define maxOf(a, b) ((a) > (b) ? (a) : (b))
 #define minOf(a, b) ((a) < (b) ? (a) : (b))

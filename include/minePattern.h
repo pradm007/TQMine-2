@@ -32,7 +32,7 @@ void _main_mineTrace() {
     }
 
     // // Perform mining
-    TracePattern tp;
+    TracePattern tp; 
     tp.loadAndTrace();
 }
 
