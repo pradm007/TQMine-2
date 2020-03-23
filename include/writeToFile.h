@@ -29,14 +29,14 @@ class Util {
   static int writeToFileFunc(const string fileName, const string fileContent) {
 
     ofstream myfile;
+    myfile.flush();
 
     if (!deleteFile(fileName))
       return false;
     
-    myfile.flush();
 
     myfile.open(fileName);
-    myfile << fileContent;
+    myfile << fileContent << std::flush;
     myfile.close();
 
     return true;

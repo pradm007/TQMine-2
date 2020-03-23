@@ -15,14 +15,16 @@ void TracePattern::loadAndTrace() {
   ifstream myfile("./traceBin/trace");
   string inp;
   if (myfile.is_open()) {
-    while (getline(myfile, inp)) {
-    }
+    inp.assign( (istreambuf_iterator<char>(myfile) ), (istreambuf_iterator<char>()) );
     myfile.close();
+  } else {
+    cout << "Something went wrong while opening file" << endl;
   }
+
   input = (char *)malloc((inp.size() + 1) * sizeof(char *));
   strcpy(input, inp.c_str());
 
-  if (input != NULL && !string(input).empty()) {
+  if (input != NULL && !inp.empty()) {
     double t = omp_get_wtime();
     void (*f)(char *);
     f = (void (*)(char *))dlsym(lib, "mine_pattern_parallelExecution");
@@ -35,6 +37,8 @@ void TracePattern::loadAndTrace() {
     }
     
 	  printf("Trace completed [Elapsed time: %.6f ms]\n", (1000 * (omp_get_wtime() - t)));
+  } else {
+    cout << "File might be empty. Size detected " << inp.size() << endl;
   }
 
   dlclose(lib);

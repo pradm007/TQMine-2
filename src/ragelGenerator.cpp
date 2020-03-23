@@ -580,8 +580,8 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
             chunkForThread.shrink_to_fit();
         }
 
+        cout << "Size of pattern Map " << patternMap.size() << endl;
         if (DISPLAY_MAP) {
-            cout << "Size of pattern Map " << patternMap.size() << endl;
             displayPatternList(patternMap);
         }
 
