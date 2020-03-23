@@ -32,7 +32,7 @@ void TracePattern::loadAndTrace() {
       printf("Dynamic Linker loaded successfully\n");
       unordered_map<string, vector<vector<string> > >* patternMap = f(input);
 
-      if (inp.size() < 10000000) { //10 MB
+      if (CSVOUTPUT && inp.size() < 10000000) { //10 MB
         string outputFile = "./output/mine-map.csv";
         if (Util::writeToCSV(outputFile, *patternMap) != 0) {
           cout << "Output file generated successfully" << endl;

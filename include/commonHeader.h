@@ -1,6 +1,11 @@
 #ifndef COMMON_HEADER
 #define COMMON_HEADER
 
+
+#ifndef CSVOUTPUT
+#define CSVOUTPUT 0
+#endif
+
 #include <bits/stdc++.h>
 #include <fstream>
 #include <omp.h>

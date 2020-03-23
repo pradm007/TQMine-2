@@ -9,6 +9,7 @@ SO_FLAG	:= ldl
 COMMAND_TRACEGEN := tracegen
 COMMAND_MAIN := main
 THREADS := 16
+CSVOUTPUT := 0
 
 LIBRARIES	:= src/ragelGenerator.cpp src/tracePattern.cpp
 
@@ -32,7 +33,7 @@ tracegen:
 
 main:
 	d=$$(date +%s)\
-	; $(CC) $(C_FLAGS) -D THREADS=$(THREADS) -I$(INCLUDE) -L$(LIB) $(SRC)/$(EXECUTABLE).cpp -$(SO_FLAG) -o $(BIN)/$(EXECUTABLE) $(LIBRARIES) -$(SO_FLAG)	\
+	; $(CC) $(C_FLAGS) -D THREADS=$(THREADS) -D CSVOUTPUT=$(CSVOUTPUT) -I$(INCLUDE) -L$(LIB) $(SRC)/$(EXECUTABLE).cpp -$(SO_FLAG) -o $(BIN)/$(EXECUTABLE) $(LIBRARIES) -$(SO_FLAG)	\
 	&& echo "Build took $$(($$(date +%s)-d)) seconds"
 	./$(BIN)/$(EXECUTABLE) $(COMMAND_MAIN)
 
