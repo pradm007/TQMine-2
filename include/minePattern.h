@@ -1,6 +1,10 @@
 #ifndef MINE_TRACE
 #define MINE_TRACE
 
+#ifndef THREADS
+#define THREADS 16
+#endif
+
 #include "../include/commonHeader.h"
 #include "../include/ragelGenerator.h"
 #include "../include/tracePattern.h"
@@ -26,8 +30,9 @@ void _main_mineTrace() {
     if (Util::fexists("./bin/fsm.rl")) {
         double t = omp_get_wtime();
         
-        system("ragel -C -T0 ./bin/fsm.rl -o ./bin/fsm.cpp && g++ -std=c++11 -fopenmp -Ofast -fpic -w -g -shared "
-                "-o ./bin/fsm.so -ldl ./bin/fsm.cpp -ldl");
+        string exec = "ragel -C -T0 ./bin/fsm.rl -o ./bin/fsm.cpp && g++ -std=c++11 -fopenmp -Ofast -fpic -w -g -shared -D THREADS=" + to_string(THREADS) + " -o ./bin/fsm.so -ldl ./bin/fsm.cpp -ldl";
+
+        system(exec.c_str());
 
         printf("State machine created successfully [Elapsed time: %.6f ms]\n", (1000 * (omp_get_wtime() - t)));
     } else {

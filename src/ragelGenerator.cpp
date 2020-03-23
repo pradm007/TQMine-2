@@ -8,7 +8,7 @@ void RagelGenerator::prepareAlphabetArr(int alphabetLength) {
     overallPattern.clear();
 
 
-    if (alphabetLength < MAX_EVENT_REPRESENTATION) {
+    if (alphabetLength <= MAX_EVENT_REPRESENTATION) {
         for (int i = 0; i < alphabetLength; i++) {
             string repsentationMarker(1,(char)(97 + i));
             alphabetArr.push_back(repsentationMarker);
@@ -167,6 +167,10 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
     #define DISPLAY_MAP 0
     #endif
 
+    #ifndef THREADS
+    #define THREADS 16
+    #endif
+
     const string numberListPattern = "[0-9]+";
     unordered_map<string, vector<vector<string> > > patternMap;
 
@@ -174,7 +178,7 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
     const int CHUNK_DELIMITER_SIZE = 1e+5;
     int g_delimiterCount = 0;
     int g_totalCombination = 4;
-    int THREAD_COUNT = 16;
+    int THREAD_COUNT = THREADS;
     const char delimiter = '|';
     vector<string> inputStream_per_thread;
     int eventRepresentationLength = )" + to_string(eventRepresentationLength) + R"(;

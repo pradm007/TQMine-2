@@ -38,7 +38,7 @@ void _main_generateTrace() {
   cin >> traceLength;
 
   int alphabetLength;
-  cout << "Alphabet Length : ";
+  cout << "Alphabet Length (max 26): ";
   cin >> alphabetLength;
 
   if (writeToFile(alphabetLength, traceLength) != 0) {
