@@ -26,17 +26,28 @@ void TracePattern::loadAndTrace() {
 
   if (input != NULL && !inp.empty()) {
     double t = omp_get_wtime();
-    void (*f)(char *);
-    f = (void (*)(char *))dlsym(lib, "mine_pattern_parallelExecution");
+    unordered_map<string, vector<vector<string> > >* (*f)(char *);
+    f = (unordered_map<string, vector<vector<string> > >* (*)(char *))dlsym(lib, "mine_pattern_parallelExecution");
     if (f) {
       printf("Dynamic Linker loaded successfully\n");
-      f(input);
+      unordered_map<string, vector<vector<string> > >* patternMap = f(input);
+
+      if (inp.size() < 10000000) { //10 MB
+        string outputFile = "./output/mine-map.csv";
+        if (Util::writeToCSV(outputFile, *patternMap) != 0) {
+          cout << "Output file generated successfully" << endl;
+        } else {
+          cout << "Something went wrong while generating output file" << endl;
+        }
+      }
+
+        
     } else {
       printf("Dynamic Linker loaded failed\n");
       printf("dlsym for function grab failed: %s\n", dlerror());
     }
     
-	  printf("Trace completed [Elapsed time: %.6f ms]\n", (1000 * (omp_get_wtime() - t)));
+	  printf("Full trace completed [Elapsed time: %.6f ms]\n", (1000 * (omp_get_wtime() - t)));
   } else {
     cout << "File might be empty. Size detected " << inp.size() << endl;
   }

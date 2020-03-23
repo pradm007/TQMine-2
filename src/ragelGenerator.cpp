@@ -199,7 +199,7 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
 	
             if (element >= 97 && element <= 122) { //Set the event length to 1. DO NOT do this before this as it would be only correct to start event length check after matching the first alphabetical event character
                 *currentEventRepresentationLength = 0;
-                numberList->push_back(" "); //Add new vector for number tracing
+                numberList->push_back(","); //Add new vector for number tracing
             }
 
             tempPatternList += element;
@@ -478,7 +478,7 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
             action NUM {
                 if (fc >= 48 && fc <= 57) {
                     if (numberList->empty()) {
-                        numberList->push_back(" ");
+                        numberList->push_back(",");
                     }
 
                     numberList->at(numberList->size() - 1) = numberList->at(numberList->size() - 1) + (char) fc;
@@ -549,8 +549,8 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
     /**
      * Function for parallel Execution
      **/
-    extern "C" {void mine_pattern_parallelExecution(char *inp);}
-    void mine_pattern_parallelExecution(char *inp) {
+    extern "C" {unordered_map<string, vector<vector<string> > >* mine_pattern_parallelExecution(char *inp);}
+    unordered_map<string, vector<vector<string> > >* mine_pattern_parallelExecution(char *inp) {
         
         double t;
 
@@ -588,6 +588,8 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
         /* calculate and print processing time*/
         t = 1000 * (omp_get_wtime() - t);
         printf("Finished in %.6f ms using %d threads. \n", t, THREAD_COUNT);
+
+        return &patternMap;
     }
 
     )";

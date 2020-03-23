@@ -41,6 +41,30 @@ class Util {
 
     return true;
   }
+
+  static int writeToCSV(const string fileName, const unordered_map<string, vector<vector<string> > > &patternMap) {
+    ofstream csvFile;
+    csvFile.open(fileName);
+    csvFile << "Pattern,Numbers\n";
+    for (auto itr = patternMap.begin(); itr != patternMap.end(); itr++) {
+      string pattern = "" + (string) itr->first;
+
+
+      vector<vector<string> > numberList = itr->second;	
+      csvFile<<pattern<<endl;
+      for (int i =0; i < numberList.size(); i++) {
+        string tracedNumber="";
+        for (int j=0;j<numberList[i].size(); j++) {
+          tracedNumber += numberList[i][j];
+        }
+        if (!tracedNumber.empty()) {
+          tracedNumber += "\n";
+          csvFile << tracedNumber;
+        }
+      }
+    }
+  }
+
 };
 
 #endif
