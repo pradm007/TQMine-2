@@ -75,7 +75,6 @@ void TracePattern::loopAndPresentData(string &patternKey, vector<vector<string> 
 					for (int j=0;j<numberList[i].size(); j++) {
 						string innerNumber = Util::removeComma(numberList[i][j]);
 						if (innerNumber.size() > 0) {
-							cout << "innerNumber " << innerNumber << endl;
 							innerList->push_back(stod(innerNumber));
 						}
 					}
@@ -129,7 +128,8 @@ void TracePattern::loadAndTrace() {
 
 
   char *input = "";
-  ifstream myfile("./traceBin/trace");
+//   ifstream myfile("./traceBin/trace");
+  ifstream myfile("./traceBin/arrhythmia_cleaned.data");
   string inp;
   if (myfile.is_open()) {
     inp.assign( (istreambuf_iterator<char>(myfile) ), (istreambuf_iterator<char>()) );

@@ -358,8 +358,8 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
                             }
                         }
 
-                        inputStream_per_thread[currentThreadIndex] += inp[currentIndex];
-                        currentEventRepresentationLength++;//increment again for new count after the delimiter
+                        //inputStream_per_thread[currentThreadIndex] += inp[currentIndex];
+                        //currentEventRepresentationLength++;//increment again for new count after the delimiter
 
                         currentQuantCount = 0;
                     }
@@ -385,7 +385,7 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
 
         inputStream_per_thread.push_back("");
 
-        for (int i=0;i<quantPlaceholderCount;i++) {
+        for (int i=0;i<=quantPlaceholderCount;i++) {
             //Identify starting marker
             char *startingMarker = inp;
             int currentEventCount = 0, isEvent = 0;
@@ -455,7 +455,7 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
                     cout << "Chunk called " << endl;
                 }
                 currentLength++;
-                if ((fc >= 97 && fc <= 122) || (fc >= 48 && fc <= 57)) {
+                if ((fc >= 97 && fc <= 122)) {
                     insertIntoTempPatternList(tempPatternList, (char) fc, &flipperOnEvent, &currentEventRepresentationLength, numberList);
                 }
             }
@@ -477,6 +477,7 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
             }
             action NUM {
                 if (fc >= 48 && fc <= 57) {
+                    insertIntoTempPatternList(tempPatternList, (char) fc, &flipperOnEvent, &currentEventRepresentationLength, numberList);
                     if (numberList->empty()) {
                         numberList->push_back(",");
                     }

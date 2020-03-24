@@ -66,7 +66,7 @@ class Util {
   }
 
   static int willingToQuit(string &input) {
-	  return input.length() == 1 && (char) input[0] == 'N';
+	  return input.length() == 1 && ((char) input[0] == 'N' || (char) input[0] == 'n');
   }
 
   static string removeComma(string &input) {
