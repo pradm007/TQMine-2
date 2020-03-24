@@ -6,6 +6,18 @@
 #define CSVOUTPUT 0
 #endif
 
+#ifndef DEBUG
+#define DEBUG 0
+#endif
+
+#ifndef THREADS
+#define THREADS 16
+#endif
+
+#ifndef DISPLAY_MAP
+#define DISPLAY_MAP 0
+#endif
+
 #include <bits/stdc++.h>
 #include <fstream>
 #include <omp.h>

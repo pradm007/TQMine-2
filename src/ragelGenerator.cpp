@@ -164,7 +164,7 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
     #endif
 
     #ifndef DISPLAY_MAP
-    #define DISPLAY_MAP 0
+    #define DISPLAY_MAP 1
     #endif
 
     #ifndef THREADS
@@ -246,7 +246,7 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
         for (int i =0; i < numberList.size(); i++) {
                 printf("\tList %d : \n\t\t\t", i+1);
                 for (int j=0;j<numberList[i].size(); j++) {
-                    cout << numberList[i][j];
+                    cout << numberList[i][j] << "||";
                 }
                 printf("\n");
             }

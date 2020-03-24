@@ -10,5 +10,7 @@ class TracePattern {
 
     public:
     void loadAndTrace();
+    void loopAndPresentData(string &patternKey, vector<vector<string> > &numberList, string &regexPattern);
+
 };
 #endif

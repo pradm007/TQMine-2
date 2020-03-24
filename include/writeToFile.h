@@ -65,6 +65,21 @@ class Util {
     }
   }
 
+  static int willingToQuit(string &input) {
+	  return input.length() == 1 && (char) input[0] == 'N';
+  }
+
+  static string removeComma(string &input) {
+    string output;
+    for(int i=0;i<input.size();i++) {
+      if (input[i] != ',') {
+        output += input[i];
+      }
+    }
+
+    return output;
+  }
+
 };
 
 #endif
