@@ -2,16 +2,6 @@
 
 TQMine efficiently mines for all possible patterns in a given trace file within a given time bound and stores in a dictionary as a CSV file. Further postprocessing on the produced dictionary can be performed for a quantitative summary.
 
-# Requirement
-
-Execute the following:
-- sudo apt install libboost-all-dev
-
-
-### What is this repository for? ###
-
-QMine efficiently mines for all possible patterns in a given trace file and stores in a dictionary as a CSV file. Further postprocessing on the produced dictionary can be performed for a quantitative summary.
-
 Version : 1.0
 
 ### How do I get set up? ###
