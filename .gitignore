@@ -35,9 +35,10 @@
 traceBin/*
 output/*
 
+bin/*
+lab/bin/*
+
 # Exceptions - Folders
 !traceBin/.gitKeep
 !output/.gitKeep
-
-bin/*
-lab/bin/*
+!bin/.gitKeep
