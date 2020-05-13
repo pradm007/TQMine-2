@@ -616,7 +616,7 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
                         printf("Finally accepted\n");
                     }
                     //Prune the previous M.
-                    tempPatternList = tempPatternList.substr(0, tempPatternList.size()-3);
+                    tempPatternList = tempPatternList.substr(0, tempPatternList.size()-1);
                     
                     // Insert into the pattern List
                     insertIntoPatternList(patternMapInternal, tempPatternList, numberList);

@@ -53,7 +53,7 @@ class Util {
       vector<vector<string> > numberList = itr->second;	
       csvFile<<pattern<<endl;
       for (int i =0; i < numberList.size(); i++) {
-        string tracedNumber="";
+        string tracedNumber=",";
         for (int j=0;j<numberList[i].size(); j++) {
           tracedNumber += numberList[i][j];
         }
