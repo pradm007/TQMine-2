@@ -1,6 +1,10 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+vector<vector<int>> eventTimeBound;
+vector<vector<int>> quantTimeBound;
+string dynamicEventTimeDefinition;
+
 string getRagelExpression(string &dynamicRegexExpression,
                           vector<vector<int>> &eventTimeBound,
                           vector<vector<int>> &quantTimeBound) {
@@ -109,11 +113,63 @@ string getRagelExpression(string &dynamicRegexExpression,
       commaFaced = 1;
     }
   }
-  //   }
 
   TREcount = quantTimeBound.size();
 
   return "((" + overallPattern + "' |') $to(CHUNK) %to(ACCEPT) $lerr(ERR));";
+}
+
+void getDynamicEventTimeDefinition() {
+  dynamicEventTimeDefinition = "//Input Event Time\n";
+  dynamicEventTimeDefinition += "int eventTRE_perInstance = " + to_string(eventTimeBound.size()) + ";\n";
+  dynamicEventTimeDefinition += "int inputEventTime[" + to_string(eventTimeBound.size()) + "][2] = {";
+  
+  for (int i = 0; i < eventTimeBound.size(); i++) {
+    dynamicEventTimeDefinition += "{";
+    for (int j = 0; j < eventTimeBound[i].size(); j++) {
+      dynamicEventTimeDefinition += to_string(eventTimeBound[i][j]);
+      if (j == 0)
+        dynamicEventTimeDefinition += ",";
+    }
+    dynamicEventTimeDefinition += "}";
+    
+    if (i < eventTimeBound.size()-1)
+        dynamicEventTimeDefinition += ",";
+  }
+
+  dynamicEventTimeDefinition += "}\n";
+  dynamicEventTimeDefinition += "int inputQuantTime[" + to_string(eventTimeBound.size() - 1) + "][2] = {";
+  
+  for (int i = 0; i < quantTimeBound.size(); i++) {
+    dynamicEventTimeDefinition += "{";
+    for (int j = 0; j < quantTimeBound[i].size(); j++) {
+      dynamicEventTimeDefinition += to_string(quantTimeBound[i][j]);
+      if (j == 0)
+        dynamicEventTimeDefinition += ",";
+    }
+    dynamicEventTimeDefinition += "}";
+    
+    if (i < quantTimeBound.size()-1)
+        dynamicEventTimeDefinition += ",";
+        
+  }
+  dynamicEventTimeDefinition += "}\n\n";
+
+  dynamicEventTimeDefinition += "int processingEventTime[" + to_string(eventTimeBound.size()) + "][2] = {";
+  
+  for (int i = 0; i < eventTimeBound.size(); i++) {
+    dynamicEventTimeDefinition += "{";
+    for (int j = 0; j < eventTimeBound[i].size(); j++) {
+      dynamicEventTimeDefinition += "0";
+      if (j == 0)
+        dynamicEventTimeDefinition += ",";
+    }
+    dynamicEventTimeDefinition += "}";
+    
+    if (i < eventTimeBound.size()-1)
+        dynamicEventTimeDefinition += ",";
+  }
+  dynamicEventTimeDefinition += "}; // This stores entry and exit for each TRE event scope\n";
 }
 
 void printArray(vector<vector<int>> &vec, string label = "array") {
@@ -130,15 +186,15 @@ int main() {
 
   string inp = "<0.1>[0,2]M[0,10]<2.3>[9,10]M[0,10]<2.3>[9,10]";
 
-  vector<vector<int>> eventTimeBound;
-  vector<vector<int>> quantTimeBound;
-
   string expression = getRagelExpression(inp, eventTimeBound, quantTimeBound);
+  getDynamicEventTimeDefinition();
 
   cout << "Input : " << inp << endl;
   cout << "Expression is " << expression << endl;
   printArray(eventTimeBound, "eventTimeBound");
   printArray(quantTimeBound, "quantTimeBound");
+  
+  cout << "getDynamicEventTimeDefinition \n" << dynamicEventTimeDefinition << endl;
 
   return 0;
 }

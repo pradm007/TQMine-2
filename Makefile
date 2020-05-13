@@ -8,9 +8,9 @@ LIB		:= lib
 SO_FLAG	:= ldl
 COMMAND_TRACEGEN := tracegen
 COMMAND_MAIN := main
-THREADS := 16
-CSVOUTPUT := 0
-DISPLAY_MAP :=0
+THREADS := 2
+CSVOUTPUT := 1
+DISPLAY_MAP :=1
 
 LIBRARIES	:= src/ragelGenerator.cpp src/tracePattern.cpp
 

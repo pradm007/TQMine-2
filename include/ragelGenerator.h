@@ -20,17 +20,25 @@ class RagelGenerator {
     const string fileName = "./bin/" + name + ".rl";
 
     string overallPattern = "";
+    
+    vector<vector<int>> eventTimeBound;
+    vector<vector<int>> quantTimeBound;
+    int eventIdentityCount = 0;// it is 3 is event representation is A001
 
     int quantPlaceholderCount = 0;
     int eventRepresentationLength = 0;
     vector<string> alphabetArr;
     vector<int> alphabetVisitied;
+    string dynamicEventTimeDefinition;
 
     void prepareAlphabetArr(int alphabetLength = 1);
     void generateExpression(string &dynamicRegexExpression, int currentIndex, int alphabetIndex, const int alphabetLength, string prefix);
-    string getRagelExpression(string &dynamicRegexExpression, int alphabetLength = 1);
+    string getRagelExpression(string &dynamicRegexExpression);
     string getFullRagelContent(string &fullRagelExpression);
     void generateRagelFile(string &dynamicRegexExpression, int alphabetLength = 1);
     void determineQuantPlaceholdersInExpression(string &dynamicRegexExpression);
+    
+    void printArray(vector<vector<int>> &vec, string label);
+    void getDynamicEventTimeDefinition();
 };
 #endif

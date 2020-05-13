@@ -127,30 +127,32 @@ void TracePattern::loadAndTrace() {
   cout << "\t\t Status : Success" << endl;
 
 
-  char *input = "";
-//   ifstream myfile("./traceBin/trace");
-  ifstream myfile("./traceBin/arrhythmia_cleaned.data");
-  string inp;
-  if (myfile.is_open()) {
-    inp.assign( (istreambuf_iterator<char>(myfile) ), (istreambuf_iterator<char>()) );
-    myfile.close();
+  //Prepare readstream for traceEM and traceTime
+  ifstream myfileTraceEM("./traceBin/traceEM");
+  ifstream myfileTraceTime("./traceBin/traceTime");
+  string inputEM_string, inputTime_string;
+  
+  //Read the trace files into string
+  if (myfileTraceEM.is_open() && myfileTraceTime.is_open()) {
+    inputEM_string.assign( (istreambuf_iterator<char>(myfileTraceEM) ), (istreambuf_iterator<char>()) );
+    myfileTraceEM.close();
+	
+	inputTime_string.assign( (istreambuf_iterator<char>(myfileTraceTime) ), (istreambuf_iterator<char>()) );
+    myfileTraceTime.close();
   } else {
-    cout << "Something went wrong while opening file" << endl;
+    cout << "Something went wrong while opening file (either traceEM or traceTime)" << endl;
   }
 
-  input = (char *)malloc((inp.size() + 1) * sizeof(char *));
-  strcpy(input, inp.c_str());
-
-  if (input != NULL && !inp.empty()) {
+  if (!inputEM_string.empty() && !inputTime_string.empty()) {
     double t = omp_get_wtime();
-    unordered_map<string, vector<vector<string> > >* (*f)(char *);
-    f = (unordered_map<string, vector<vector<string> > >* (*)(char *))dlsym(lib, "mine_pattern_parallelExecution");
+    unordered_map<string, vector<vector<string> > >* (*f)(string, string);
+    f = (unordered_map<string, vector<vector<string> > >* (*)(string, string))dlsym(lib, "mine_pattern_parallelExecution");
     if (f) {
       printf("Dynamic Linker loaded successfully\n");
-      unordered_map<string, vector<vector<string> > >* patternMap = f(input);
+      unordered_map<string, vector<vector<string> > >* patternMap = f(inputEM_string, inputTime_string);
 
-      if (CSVOUTPUT && inp.size() < 10000000) { //10 MB
-        string outputFile = "./output/mine-map.csv";
+      if (CSVOUTPUT && inputEM_string.size() < 10000000) { //10 MB
+        string outputFile = "./output/mine-map-timed.csv";
         if (Util::writeToCSV(outputFile, *patternMap) != 0) {
           cout << "Output file generated successfully" << endl;
         } else {
@@ -158,7 +160,8 @@ void TracePattern::loadAndTrace() {
         }
       }
 
-      int quit = 0;
+	  // Work on this
+      /* int quit = 0;
       string inputString = "";
       while(!quit) {
         cout << "Enter pattern that you are interested with specific event symbol (Enter N to quit) : ";
@@ -193,7 +196,7 @@ void TracePattern::loadAndTrace() {
           cout << "Pattern not found. Try again " << endl;
         }
       }
-
+    */
         
     } else {
       printf("Dynamic Linker loaded failed\n");
@@ -202,7 +205,7 @@ void TracePattern::loadAndTrace() {
     
 	  printf("Full trace completed [Elapsed time: %.6f ms]\n", (1000 * (omp_get_wtime() - t)));
   } else {
-    cout << "File might be empty. Size detected " << inp.size() << endl;
+    cout << "File might be empty. Size detected (traceEM) -> " << inputEM_string.size() << " and (traceTime) -> " << inputTime_string.size() << endl;
   }
 
   dlclose(lib);
