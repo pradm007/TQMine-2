@@ -5,8 +5,10 @@
 #include "../include/writeToFile.h"
 #include <stdio.h>
 
-const string name = "trace";
-const string fileName = "./traceBin/" + name;
+const string nameEM = "traceEM", nameTime = "traceTime";
+
+const string fileNameEM = "./traceBin/" + nameEM;
+const string fileNameTime = "./traceBin/" + nameTime;
 
 int getRandomDigit(int maxUpperLimit = 10) { return rand() % maxUpperLimit; }
 
@@ -18,15 +20,37 @@ char getRandomCharacter(int maxShift = 1) {
 
 int writeToFile(int alphabetLength = 4, long traceLength = 100) {
 
+  int result_fileNameTime = 0, result_fileNameEM = 0;
   string traceString = "";
   for (long i = 0; i < traceLength; i++) {
-    traceString +=
-        getRandomCharacter(alphabetLength) + to_string(getRandomDigit(100000));
+    string event(1, getRandomCharacter(alphabetLength)); 
+    traceString += " " + event; //Add event
+    traceString += " " + to_string(getRandomDigit(100));
+    traceString += " " + to_string(getRandomDigit(100));
+    traceString += " " + to_string(getRandomDigit(100));
   }
 
-  traceString += getRandomCharacter(alphabetLength) + "\n";
+  traceString += " " + to_string(getRandomDigit(100000)) + "\n"; // last quant
 
-  return Util::writeToFileFunc(fileName, traceString);
+  result_fileNameEM = Util::writeToFileFunc(fileNameEM, traceString);
+  
+  traceString = "";
+  long long previousNumber = 0;
+  for (long i = 0; i < traceLength; i++) {
+    
+    for (int j=0;j<4;j++) { //Since we are adding 4 events/quant i.e A01 23 43 23
+      previousNumber += getRandomDigit(10);
+      traceString += " " + to_string(previousNumber); //Add event
+    }
+  }
+  previousNumber += getRandomDigit(10);
+  traceString += " " + to_string(previousNumber); //Add time for the last quant
+  traceString += "\n";
+  
+  result_fileNameTime = Util::writeToFileFunc(fileNameTime, traceString);
+  
+  return result_fileNameEM & result_fileNameTime;
+  
 }
 
 void _main_generateTrace() {
