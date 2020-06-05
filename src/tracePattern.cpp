@@ -11,6 +11,15 @@ void TracePattern::loopAndPresentData(string &patternKey, vector<vector<string> 
 		cout << " patternKey " << patternKey << endl;
 	}
 
+	// //Remove dot from patternKey i.e from the user's input
+	// string newPatternKey = "";
+	// for (int i=0;i<patternKey.size();i++) {
+	// 	if (patternKey[i] != '.') {
+	// 		newPatternKey += patternKey[i];
+	// 	}
+	// }
+	// patternKey = newPatternKey;
+
 	//This breaks the pattern key into sub elements
 	while(patternKey[currentIndex] != '\0') {
 		if (patternKey[currentIndex] != '[' && bracketStart == 0) {
@@ -47,11 +56,13 @@ void TracePattern::loopAndPresentData(string &patternKey, vector<vector<string> 
 	try {
 		vector<vector<double>> numberListInDouble;
 		for (int i =0; i < numberList.size(); i++) {
-				// printf("\tList %d : \n\t\t\t", i+1);
+				printf("\tList %d : \n\t\t\t", i+1);
 				int start = 0;
 				string fullMatchedPattern;
+				//  = patternKeyMap[start++];
 
 				for (int j=0;j<numberList[i].size(); j++) {
+					// cout << "\tNumber in this list " << numberList[i][j] << endl;
 					string numberIs = Util::removeComma(numberList[i][j]);
 					cout << "numberIs " << numberIs << endl;
 
@@ -68,6 +79,7 @@ void TracePattern::loopAndPresentData(string &patternKey, vector<vector<string> 
 					fullMatchedPattern += patternKeyMap[start++];
 				}
 				cout << "fullMatchedPattern " << fullMatchedPattern << endl;
+				cout << "regexPattern " << regexPattern << endl;
 
 				if (regex_match(fullMatchedPattern, regex(regexPattern)) ) {
 					if (DEBUG) {
@@ -130,8 +142,8 @@ void TracePattern::loadAndTrace() {
 
 
   //Prepare readstream for traceEM and traceTime
-  ifstream myfileTraceEM("./traceBin/traceEM");
-  ifstream myfileTraceTime("./traceBin/traceTime");
+  ifstream myfileTraceEM("./traceBin/traceEM_ori");
+  ifstream myfileTraceTime("./traceBin/traceTime_ori");
   string inputEM_string, inputTime_string;
   
   //Read the trace files into string
