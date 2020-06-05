@@ -53,6 +53,7 @@ void TracePattern::loopAndPresentData(string &patternKey, vector<vector<string> 
 
 				for (int j=0;j<numberList[i].size(); j++) {
 					string numberIs = Util::removeComma(numberList[i][j]);
+					cout << "numberIs " << numberIs << endl;
 
 					if ( numberIs.size() > 0) {
 
@@ -66,6 +67,7 @@ void TracePattern::loopAndPresentData(string &patternKey, vector<vector<string> 
 				if (start < patternKeyMap.size()) { //flush the remainning, there should be only 1 pattern left at max
 					fullMatchedPattern += patternKeyMap[start++];
 				}
+				cout << "fullMatchedPattern " << fullMatchedPattern << endl;
 
 				if (regex_match(fullMatchedPattern, regex(regexPattern)) ) {
 					if (DEBUG) {
@@ -161,11 +163,11 @@ void TracePattern::loadAndTrace() {
       }
 
 	  // Work on this
-      /* int quit = 0;
+      int quit = 0;
       string inputString = "";
       while(!quit) {
         cout << "Enter pattern that you are interested with specific event symbol (Enter N to quit) : ";
-        inputString = "a[0-9]+b";
+        inputString = "a.M.b";
         cin >> inputString;
         if (Util::willingToQuit(inputString)) {
           cout << "Exiting..." << endl;
@@ -175,7 +177,7 @@ void TracePattern::loadAndTrace() {
         auto itr = patternMap->find(inputString);
         const bool is_in = itr != patternMap->end();
         if (is_in) {
-          string inputString2 = "a[0-9]+b";
+          string inputString2 = "a.M.b";
           cout << "Enter interested regex (Enter N to quit) : " ;
           cin >> inputString2;
           if (Util::willingToQuit(inputString2)) {
@@ -196,7 +198,7 @@ void TracePattern::loadAndTrace() {
           cout << "Pattern not found. Try again " << endl;
         }
       }
-    */
+   
         
     } else {
       printf("Dynamic Linker loaded failed\n");

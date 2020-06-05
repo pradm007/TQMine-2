@@ -279,8 +279,9 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
         for (int i=0; i<eventTRE_perInstance; i++) {
             for (int j=0; j<2; j++) {
                 int time_diff = processingEventTime[i][1] - processingEventTime[i][0];
-                if (! (inputEventTime[i][0] <= time_diff && time_diff <= inputEventTime[i][1]) ) {
-                    if (DEBUG) {
+                if (!(inputEventTime[i][0] == 0 && inputEventTime[i][1] == 0) &&
+				    ! (inputEventTime[i][0] <= time_diff && time_diff <= inputEventTime[i][1]) ){
+            	    if (DEBUG) {
                         cout << "Time diff did not match for TRE"<<i<<endl;
                     }
                     return 0; // ERROR IN SCOPE
@@ -292,8 +293,9 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
         for (int i=0; i<eventTRE_perInstance-1; i++) {
             for (int j=0; j<2; j++) {
                 int time_diff = processingEventTime[i+1][0] - processingEventTime[i][1];
-                if (! (inputQuantTime[i][0] <= time_diff && time_diff <= inputQuantTime[i][1]) ) {
-                    if (DEBUG) {
+                if (!(inputEventTime[i][0] == 0 && inputEventTime[i][1] == 0) &&
+				    ! (inputQuantTime[i][0] <= time_diff && time_diff <= inputQuantTime[i][1]) ) {
+				    if (DEBUG) {
                         cout << "Time diff did not match among TRE"<<i<< " and TRE"<<(i+1)<<endl;
                     }
                     return 0; // ERROR IN SCOPE
@@ -573,7 +575,7 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
                     
                     if (_event_OR_quant != 2) {
                         //Insert into pattern list
-                        tempPatternList += "M.";
+                        tempPatternList += "[0-9]+.";
                         _event_OR_quant = 2; //Do only once
                     }
                 } else {
@@ -900,6 +902,7 @@ void RagelGenerator::generateRagelFile(string &dynamicRegexExpression, int alpha
         string fullRagelExpression = getRagelExpression(dynamicRegexExpression);
         getDynamicEventTimeDefinition();
         
+        cout << "Dynamic Regex Expression " << dynamicRegexExpression << endl;
         cout << "Expression is " << fullRagelExpression << endl;
         printArray(eventTimeBound, "eventTimeBound");
         printArray(quantTimeBound, "quantTimeBound");
