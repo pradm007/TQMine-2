@@ -142,8 +142,10 @@ void TracePattern::loadAndTrace() {
 
 
   //Prepare readstream for traceEM and traceTime
-  ifstream myfileTraceEM("./traceBin/traceEM_ori");
-  ifstream myfileTraceTime("./traceBin/traceTime_ori");
+  ifstream myfileTraceEM("./traceBin/traceEM");
+//   ifstream myfileTraceEM("./traceBin/traceEM_ori");
+  ifstream myfileTraceTime("./traceBin/traceTime");
+//   ifstream myfileTraceTime("./traceBin/traceTime_ori");
   string inputEM_string, inputTime_string;
   
   //Read the trace files into string

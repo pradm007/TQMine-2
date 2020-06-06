@@ -25,9 +25,10 @@ int writeToFile(int alphabetLength = 4, long traceLength = 100) {
   for (long i = 0; i < traceLength; i++) {
     string event(1, getRandomCharacter(alphabetLength)); 
     traceString += " " + event; //Add event
-    traceString += " " + to_string(getRandomDigit(100));
-    traceString += " " + to_string(getRandomDigit(100));
-    traceString += " " + to_string(getRandomDigit(100));
+    // traceString += " " + event + to_string(getRandomDigit(10)) + to_string(getRandomDigit(10)) + to_string(getRandomDigit(10)) + to_string(getRandomDigit(10)) + to_string(getRandomDigit(10)); //Add event
+    traceString += " " + to_string(getRandomDigit(1000));
+    // traceString += " " + to_string(getRandomDigit(100));
+    // traceString += " " + to_string(getRandomDigit(100));
   }
 
   traceString += " " + to_string(getRandomDigit(100000)) + "\n"; // last quant
@@ -38,7 +39,7 @@ int writeToFile(int alphabetLength = 4, long traceLength = 100) {
   long long previousNumber = 0;
   for (long i = 0; i < traceLength; i++) {
     
-    for (int j=0;j<4;j++) { //Since we are adding 4 events/quant i.e A01 23 43 23
+    for (int j=0;j<2;j++) { //Since we are adding 4 events/quant i.e A01 23 43 23
       previousNumber += getRandomDigit(10);
       traceString += " " + to_string(previousNumber); //Add event
     }
