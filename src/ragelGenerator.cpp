@@ -179,7 +179,7 @@ string RagelGenerator::getRagelExpression(string &dynamicRegexExpression) {
 void RagelGenerator::getDynamicEventTimeDefinition() {
   dynamicEventTimeDefinition = "//Input Event Time\n";
   dynamicEventTimeDefinition += "int eventTRE_perInstance = " + to_string(eventTimeBound.size()) + ";\n";
-  dynamicEventTimeDefinition += "int inputEventTime[" + to_string(eventTimeBound.size()) + "][2] = {";
+  dynamicEventTimeDefinition += "long inputEventTime[" + to_string(eventTimeBound.size()) + "][2] = {";
   
   for (int i = 0; i < eventTimeBound.size(); i++) {
     dynamicEventTimeDefinition += "{";
@@ -195,7 +195,7 @@ void RagelGenerator::getDynamicEventTimeDefinition() {
   }
 
   dynamicEventTimeDefinition += "};\n";
-  dynamicEventTimeDefinition += "int inputQuantTime[" + to_string(eventTimeBound.size() - 1) + "][2] = {";
+  dynamicEventTimeDefinition += "long inputQuantTime[" + to_string(eventTimeBound.size() - 1) + "][2] = {";
   
   for (int i = 0; i < quantTimeBound.size(); i++) {
     dynamicEventTimeDefinition += "{";
@@ -212,7 +212,7 @@ void RagelGenerator::getDynamicEventTimeDefinition() {
   }
   dynamicEventTimeDefinition += "};\n\n";
 
-  dynamicEventTimeDefinition += "int processingEventTime[" + to_string(eventTimeBound.size()) + "][2] = {";
+  dynamicEventTimeDefinition += "long processingEventTime[" + to_string(eventTimeBound.size()) + "][2] = {";
   
   for (int i = 0; i < eventTimeBound.size(); i++) {
     dynamicEventTimeDefinition += "{";
@@ -256,9 +256,9 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
     #define MINIMAL_2 1
     #endif
 
-    #ifndef DISPLAY_MAP
-    #define DISPLAY_MAP 1
-    #endif
+     #ifndef DISPLAY_MAP
+     #define DISPLAY_MAP 1
+     #endif
 
     const string NUM_REGEX = "[0-9]+";
     const string FLOAT_REGEX = "[0-9]*\.?[0-9]+";
@@ -278,7 +278,7 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
         //Check time bounds within TREs
         for (int i=0; i<eventTRE_perInstance; i++) {
             for (int j=0; j<2; j++) {
-                int time_diff = processingEventTime[i][1] - processingEventTime[i][0];
+                long time_diff = processingEventTime[i][1] - processingEventTime[i][0];
                 if (!(inputEventTime[i][0] == 0 && inputEventTime[i][1] == 0) &&
 				    ! (inputEventTime[i][0] <= time_diff && time_diff <= inputEventTime[i][1]) ){
             	    if (DEBUG) {
@@ -292,7 +292,7 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
         //Check time bounds among TREs
         for (int i=0; i<eventTRE_perInstance-1; i++) {
             for (int j=0; j<2; j++) {
-                int time_diff = processingEventTime[i+1][0] - processingEventTime[i][1];
+                long time_diff = processingEventTime[i+1][0] - processingEventTime[i][1];
                 if (!(inputEventTime[i][0] == 0 && inputEventTime[i][1] == 0) &&
 				    ! (inputQuantTime[i][0] <= time_diff && time_diff <= inputQuantTime[i][1]) ) {
 				    if (DEBUG) {
@@ -314,7 +314,7 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
             cout << "--"<<inputTime_array[i] << endl;
         } */
         
-        return stoi(inputTime_array[tokenCounter]);
+        return stol(inputTime_array[tokenCounter]);
     }
 
     void insertIntoPatternList(unordered_map<string, vector < vector<string > > > &patternMap, string  &fullPattern, vector<string > *numberList) {
@@ -458,8 +458,8 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
             printf("cs is %d and foo_start is %d\n", cs, foo_start);
         }
         
-        int previousEventTime=0;
-        int _eventTime = 0;
+        long previousEventTime=0;
+        long _eventTime = 0;
         int _quantValue = 0;
         int currentTRECount = 0;
         int _has_event_entered = 0; // Determines if we enter an event stage in TRE. Gets reset immediately at M stage
@@ -684,7 +684,7 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
             cout << "Finished processing \n\n";
         }
         
-        if (DEBUG || 0) {
+        if (DEBUG) {
             cout << "Displaying internal pattern map per thread" << endl;
             #pragma omp critical
             displayPatternList(patternMapInternal);

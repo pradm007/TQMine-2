@@ -56,7 +56,7 @@ void TracePattern::loopAndPresentData(string &patternKey, vector<vector<string> 
 	try {
 		vector<vector<double>> numberListInDouble;
 		for (int i =0; i < numberList.size(); i++) {
-				printf("\tList %d : \n\t\t\t", i+1);
+				printf("\tList %d : \n", i+1);
 				int start = 0;
 				string fullMatchedPattern;
 				//  = patternKeyMap[start++];
@@ -64,22 +64,21 @@ void TracePattern::loopAndPresentData(string &patternKey, vector<vector<string> 
 				for (int j=0;j<numberList[i].size(); j++) {
 					// cout << "\tNumber in this list " << numberList[i][j] << endl;
 					string numberIs = Util::removeComma(numberList[i][j]);
-					cout << "numberIs " << numberIs << endl;
 
 					if ( numberIs.size() > 0) {
-
+						cout << "\t\t\t---" << numberIs << endl;
 						if (start < patternKeyMap.size()) {
 							fullMatchedPattern += patternKeyMap[start++];
 						}
-						fullMatchedPattern += numberIs;
+						fullMatchedPattern += numberIs + ".";
 					}
 				}
 
 				if (start < patternKeyMap.size()) { //flush the remainning, there should be only 1 pattern left at max
 					fullMatchedPattern += patternKeyMap[start++];
 				}
-				cout << "fullMatchedPattern " << fullMatchedPattern << endl;
-				cout << "regexPattern " << regexPattern << endl;
+				// cout << "fullMatchedPattern " << fullMatchedPattern << endl;
+				// cout << "regexPattern " << regexPattern << endl;
 
 				if (regex_match(fullMatchedPattern, regex(regexPattern)) ) {
 					if (DEBUG) {
@@ -142,9 +141,11 @@ void TracePattern::loadAndTrace() {
 
 
   //Prepare readstream for traceEM and traceTime
-  ifstream myfileTraceEM("./traceBin/traceEM");
+//   ifstream myfileTraceEM("./traceBin/traceEM");
+  ifstream myfileTraceEM("./traceBin/data-01_cleaned_EM");
 //   ifstream myfileTraceEM("./traceBin/traceEM_ori");
-  ifstream myfileTraceTime("./traceBin/traceTime");
+//   ifstream myfileTraceTime("./traceBin/traceTime");
+  ifstream myfileTraceTime("./traceBin/data-01_cleaned_Time");
 //   ifstream myfileTraceTime("./traceBin/traceTime_ori");
   string inputEM_string, inputTime_string;
   
@@ -187,9 +188,25 @@ void TracePattern::loadAndTrace() {
           cout << "Exiting..." << endl;
           break;
         }
-
         auto itr = patternMap->find(inputString);
-        const bool is_in = itr != patternMap->end();
+		
+		// vector<vector<string> > numberList;
+		// cout << "Checking input regex " << inputString << endl;
+		
+		// for(unordered_map<string,vector<vector<string> >>::iterator iter = patternMap->begin();
+		// 	iter != patternMap->end(); ++iter){
+			
+		// 	string eachKey_s = iter->first;
+			
+		// 	cout << "Checking with " << eachKey_s << endl;
+		// 	if (regex_match(eachKey_s, regex(inputString))) {
+		// 		cout << "matched, now inserting all its elements" << endl;
+		// 		numberList.insert(numberList.end(), iter->second.begin(), iter->second.end());
+		// 	}
+		// }
+        // const bool is_in = numberList.size() > 0;
+		
+		const bool is_in = itr != patternMap->end();
         if (is_in) {
           string inputString2 = "a.M.b";
           cout << "Enter interested regex (Enter N to quit) : " ;
