@@ -55,7 +55,9 @@ class Util {
       for (int i =0; i < numberList.size(); i++) {
         string tracedNumber=",";
         for (int j=0;j<numberList[i].size(); j++) {
-          tracedNumber += numberList[i][j];
+          if (numberList[i][j].size() > 0) {
+            tracedNumber += numberList[i][j] + ",";
+          }
         }
         if (!tracedNumber.empty()) {
           tracedNumber += "\n";
